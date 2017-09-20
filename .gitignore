@@ -26,3 +26,8 @@ _NCrunch_*
 **/packages/*
 !**/packages/build/
 AssemblyInfo_Patch.cs
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+s3_connectioninfo.txt

@@ -48,9 +48,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Rebus" Version="4.0.1" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.11" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <!-- TODO: Should be re-enabled when ready to merge (doesn't work on non-Windows) -->
   <!--<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="$(ProjectDir)..\scripts\patch_assemblyinfo.cmd $(ProjectDir)" />
   </Target>-->
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="AmazonS3\" />
+    <Folder Include="AmazonS3\Core\" />
+  </ItemGroup>
 </Project>

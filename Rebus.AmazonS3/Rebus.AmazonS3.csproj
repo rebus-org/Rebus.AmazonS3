@@ -47,9 +47,10 @@
     <None Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Rebus" Version="4.0.0" />
+    <PackageReference Include="Rebus" Version="4.0.1" />
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <!-- TODO: Should be re-enabled when ready to merge (doesn't work on non-Windows) -->
+  <!--<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="$(ProjectDir)..\scripts\patch_assemblyinfo.cmd $(ProjectDir)" />
-  </Target>
+  </Target>-->
 </Project>

@@ -53,7 +53,7 @@ namespace Rebus.AmazonS3.Tests
             catch (Exception exception)
             {
                 throw new FormatException(
-                    $"Could not extract access key ID, secret access key, and region endpoint from this: '{textString}' - expected the form 'AccessKeyId=blabla; SecretAccessKey=blablalba; RegionEndpoint=something'",
+                    "Could not extract access key ID, secret access key, and region endpoint from string - expected the form \'AccessKeyId=blabla; SecretAccessKey=blablalba; RegionEndpoint=something\'",
                     exception);
             }
         }

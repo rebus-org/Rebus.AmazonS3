@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Amazon;
 using Amazon.Runtime;
@@ -33,8 +34,6 @@ namespace Rebus.AmazonS3.Tests
 
         public static ConnectionInfo CreateFromString(string textString)
         {
-            Console.WriteLine("Parsing connectionInfo from string: {0}", textString);
-
             var keyValuePairs = textString.Split("; ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             try
@@ -44,19 +43,32 @@ namespace Rebus.AmazonS3.Tests
                     .ToDictionary(kv => kv.First(), kv => kv.Last());
 
                 return new ConnectionInfo(
-                    keysAndValues["AccessKeyId"],
-                    keysAndValues["SecretAccessKey"],
-                    keysAndValues["RegionEndpoint"],
-                    keysAndValues["BucketName"]
+                    GetValue(keysAndValues, "AccessKeyId"),
+                    GetValue(keysAndValues, "SecretAccessKey"),
+                    GetValue(keysAndValues, "RegionEndpoint"),
+                    GetValue(keysAndValues, "BucketName")
                 );
             }
             catch (Exception exception)
             {
                 throw new FormatException(
-                    "Could not extract access key ID, secret access key, and region endpoint from string - expected the form \'AccessKeyId=blabla; SecretAccessKey=blablalba; RegionEndpoint=something\'",
+                    "Could not extract access key ID, secret access key, and region endpoint from string - expected the form \'AccessKeyId=blabla; SecretAccessKey=blablalba; RegionEndpoint=something; BucketName=whatever\'",
                     exception);
             }
         }
+
+        static string GetValue(Dictionary<string, string> keysAndValues, string key)
+        {
+            try
+            {
+                return keysAndValues[key];
+            }
+            catch
+            {
+                throw new KeyNotFoundException($"Could not find key '{key}' - got these keys: {string.Join(", ", keysAndValues.Keys)}");
+            }
+        }
+        
 
         private static RegionEndpoint GetRegionEndpoint(string regionEndpointName)
         {

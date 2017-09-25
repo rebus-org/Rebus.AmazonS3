@@ -51,23 +51,6 @@ namespace Rebus.AmazonS3
             }
         }
 
-        private void EnsureBucketExists()
-        {
-            TryCatch(() =>
-            {
-                using (var s3Client = CreateS3Client()) 
-                {
-                    if (AmazonS3Util.DoesS3BucketExist(s3Client, _options.BucketName)) return;
-
-                    s3Client.PutBucket(new PutBucketRequest
-                    {
-                        BucketName = _options.BucketName,
-                        UseClientRegion = true
-                    });
-                }
-            });
-        }
-
         public async Task Save(string id, Stream source, Dictionary<string, string> metadata = null)
         {
             await TryCatchAsync(id, async (identity) =>
@@ -121,6 +104,23 @@ namespace Rebus.AmazonS3
                 using (var s3Client = CreateS3Client())
                 {
                     return (await GetObjectMetadataAsync(s3Client, identity, true)).ToDictionary();
+                }
+            });
+        }
+
+        private void EnsureBucketExists()
+        {
+            TryCatch(() =>
+            {
+                using (var s3Client = CreateS3Client())
+                {
+                    if (AmazonS3Util.DoesS3BucketExist(s3Client, _options.BucketName)) return;
+
+                    s3Client.PutBucket(new PutBucketRequest
+                    {
+                        BucketName = _options.BucketName,
+                        UseClientRegion = true
+                    });
                 }
             });
         }

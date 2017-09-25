@@ -47,7 +47,7 @@ namespace Rebus.AmazonS3
 
             if (options.AutoCreateBucket)
             {
-                EnsureBucketExists();
+                EnsureBucketExistsAsync().GetAwaiter().GetResult();
             }
         }
 
@@ -108,19 +108,26 @@ namespace Rebus.AmazonS3
             });
         }
 
-        private void EnsureBucketExists()
+        private async Task EnsureBucketExistsAsync()
         {
-            TryCatch(() =>
+            await TryCatchAsync(async () =>
             {
                 using (var s3Client = CreateS3Client())
                 {
-                    if (AmazonS3Util.DoesS3BucketExist(s3Client, _options.BucketName)) return;
+                    if (await AmazonS3Util.DoesS3BucketExistAsync(s3Client, _options.BucketName)) return;
 
-                    s3Client.PutBucket(new PutBucketRequest
+                    try
                     {
-                        BucketName = _options.BucketName,
-                        UseClientRegion = true
-                    });
+                        await s3Client.PutBucketAsync(new PutBucketRequest
+                        {
+                            BucketName = _options.BucketName,
+                            UseClientRegion = true                        
+                        });
+                    }
+                    catch (AmazonS3Exception e) when (e.StatusCode == HttpStatusCode.Conflict)
+                    {
+                        // Bucket already exists, do nothing
+                    }
                 }
             });
         }
@@ -199,11 +206,11 @@ namespace Rebus.AmazonS3
             }
         }
 
-        private void TryCatch(Action action)
+        private async Task TryCatchAsync(Func<Task> asyncFunc)
         {
             try
             {
-                action();
+                await asyncFunc();
             }
             catch (AmazonS3Exception e) when (e.ErrorCode.Equals("InvalidAccessKeyId") || e.ErrorCode.Equals("InvalidSecurity"))
             {

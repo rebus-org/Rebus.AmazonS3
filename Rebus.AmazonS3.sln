@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3", "Rebus.Ama
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3.Tests", "Rebus.AmazonS3.Tests\Rebus.AmazonS3.Tests.csproj", "{C1A8658E-811B-449B-8254-8D10A61A1285}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3.TestsRunner", "Rebus.AmazonS3.TestsRunner\Rebus.AmazonS3.TestsRunner.csproj", "{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,12 @@ Global
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug_macOS|Any CPU.ActiveCfg = Debug_macOS|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug_macOS|Any CPU.Build.0 = Debug_macOS|Any CPU
+		{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}.Debug_macOS|Any CPU.ActiveCfg = Release|Any CPU
+		{CCCD5EB4-830C-4259-9D93-ACDBE0B72356}.Debug_macOS|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

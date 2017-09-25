@@ -13,6 +13,7 @@ using Rebus.DataBus;
 using Rebus.Exceptions;
 using Rebus.Logging;
 using Rebus.Time;
+using Amazon.S3.Util;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Rebus.AmazonS3.Tests")]
 
@@ -43,6 +44,28 @@ namespace Rebus.AmazonS3
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _log = rebusLoggerFactory?.GetLogger<AmazonS3DataBusStorage>() ?? throw new ArgumentNullException(nameof(rebusLoggerFactory));
             _metadataCollectionFactory = new S3MetadataCollectionFactory(options);
+
+            if (options.AutoCreateBucket)
+            {
+                EnsureBucketExists();
+            }
+        }
+
+        private void EnsureBucketExists()
+        {
+            TryCatch(() =>
+            {
+                using (var s3Client = CreateS3Client()) 
+                {
+                    if (AmazonS3Util.DoesS3BucketExist(s3Client, _options.BucketName)) return;
+
+                    s3Client.PutBucket(new PutBucketRequest
+                    {
+                        BucketName = _options.BucketName,
+                        UseClientRegion = true
+                    });
+                }
+            });
         }
 
         public async Task Save(string id, Stream source, Dictionary<string, string> metadata = null)
@@ -79,7 +102,7 @@ namespace Rebus.AmazonS3
                     await UpdateReadTimeAsync(identity, s3Client);
 
                     // Open stream to object
-                    using (var transferUtility = CreateTransferUtility())
+                    using (var transferUtility = CreateTransferUtility(s3Client))
                     {
                         return await transferUtility.OpenStreamAsync(new TransferUtilityOpenStreamRequest
                         {
@@ -165,6 +188,31 @@ namespace Rebus.AmazonS3
             {
                 // Rebus expects an ArgumentException when an unknown ID is provided
                 throw new ArgumentException($"Could not find data ID {id}", e);
+            }
+            catch (AmazonS3Exception e)
+            {
+                throw new RebusApplicationException(e, "Unexpected Amazon S3 exception occurred");
+            }
+            catch (Exception e)
+            {
+                throw new RebusApplicationException(e, "Unexpected exception");
+            }
+        }
+
+        private void TryCatch(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (AmazonS3Exception e) when (e.ErrorCode.Equals("InvalidAccessKeyId") || e.ErrorCode.Equals("InvalidSecurity"))
+            {
+                throw new RebusApplicationException(e, "Invalid AWS credentials");
+            }
+            catch (AmazonS3Exception e) when (e.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Rebus expects an ArgumentException when an unknown ID is provided
+                throw new ArgumentException("Not found", e);
             }
             catch (AmazonS3Exception e)
             {

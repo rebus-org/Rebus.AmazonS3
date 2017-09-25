@@ -21,6 +21,7 @@ namespace Rebus.Config
             ObjectKeySuffix = null;
             MetadataDelimiter = '=';
             KnownMetadataKeys = null;
+            AutoCreateBucket = true;
         }
 
         /// <summary>
@@ -62,5 +63,10 @@ namespace Rebus.Config
         /// </remarks>
         /// <value>The known keys.</value>
         public ISet<string> KnownMetadataKeys { get; set; }
+
+        /// <summary>
+        /// Whether or not to automatically create the bucket, if it doesn't already exist (default true)
+        /// </summary>
+        public bool AutoCreateBucket { get; set; }
     }
 }

@@ -10,24 +10,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stuff", "stuff", "{1ABDD7C1
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rebus.AmazonS3", "Rebus.AmazonS3\Rebus.AmazonS3.csproj", "{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3", "Rebus.AmazonS3\Rebus.AmazonS3.csproj", "{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rebus.AmazonS3.Tests", "Rebus.AmazonS3.Tests\Rebus.AmazonS3.Tests.csproj", "{C1A8658E-811B-449B-8254-8D10A61A1285}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3.Tests", "Rebus.AmazonS3.Tests\Rebus.AmazonS3.Tests.csproj", "{C1A8658E-811B-449B-8254-8D10A61A1285}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Debug_macOS|Any CPU = Debug_macOS|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}.Debug_macOS|Any CPU.ActiveCfg = Debug_macOS|Any CPU
+		{11EE4AE1-BA2A-42E1-B608-600EDCF26AEA}.Debug_macOS|Any CPU.Build.0 = Debug_macOS|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug_macOS|Any CPU.ActiveCfg = Debug_macOS|Any CPU
+		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug_macOS|Any CPU.Build.0 = Debug_macOS|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

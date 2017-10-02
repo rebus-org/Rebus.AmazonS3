@@ -2,6 +2,11 @@ image: Visual Studio 2017
 
 shallow_clone: true
 
+test:
+  assemblies:
+    only:
+      - Rebus.AmazonS3.Tests.dll
+
 cache:
   - packages -> **\packages.config
   - '%LocalAppData%\NuGet\Cache'

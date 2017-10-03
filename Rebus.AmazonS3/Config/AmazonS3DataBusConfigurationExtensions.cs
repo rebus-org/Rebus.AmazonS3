@@ -3,16 +3,16 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Transfer;
-using Rebus.Config;
+using Rebus.AmazonS3;
 using Rebus.DataBus;
 using Rebus.Logging;
 
-namespace Rebus.AmazonS3
+namespace Rebus.Config
 {
     /// <summary>
     /// Provides extensions methods for configuring the Amazon S3 storage for the data bus
     /// </summary>
-    public static class AmazonS3DataBusExtensions
+    public static class AmazonS3DataBusConfigurationExtensions
     {
         /// <summary>
         /// Configures the data bus to store data in Amazon S3

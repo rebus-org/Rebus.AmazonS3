@@ -10,30 +10,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stuff", "stuff", "{1ABDD7C1
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3.Tests", "Rebus.AmazonS3.Tests\Rebus.AmazonS3.Tests.csproj", "{C1A8658E-811B-449B-8254-8D10A61A1285}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rebus.AmazonS3.Tests", "Rebus.AmazonS3.Tests\Rebus.AmazonS3.Tests.csproj", "{C1A8658E-811B-449B-8254-8D10A61A1285}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebus.AmazonS3", "Rebus.AmazonS3\Rebus.AmazonS3.csproj", "{82E8773F-8B80-44FC-8977-3DD21A199467}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rebus.AmazonS3", "Rebus.AmazonS3\Rebus.AmazonS3.csproj", "{82E8773F-8B80-44FC-8977-3DD21A199467}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_macOS|Any CPU = Debug_macOS|Any CPU
 		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
 		macOS|Any CPU = macOS|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug_macOS|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug_macOS|Any CPU.Build.0 = Debug|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1A8658E-811B-449B-8254-8D10A61A1285}.macOS|Any CPU.ActiveCfg = Release|Any CPU
+		{C1A8658E-811B-449B-8254-8D10A61A1285}.macOS|Any CPU.Build.0 = Release|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1A8658E-811B-449B-8254-8D10A61A1285}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1A8658E-811B-449B-8254-8D10A61A1285}.macOS|Any CPU.ActiveCfg = macOS|Any CPU
-		{C1A8658E-811B-449B-8254-8D10A61A1285}.macOS|Any CPU.Build.0 = macOS|Any CPU
-		{82E8773F-8B80-44FC-8977-3DD21A199467}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{82E8773F-8B80-44FC-8977-3DD21A199467}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82E8773F-8B80-44FC-8977-3DD21A199467}.Debug_macOS|Any CPU.ActiveCfg = Debug|Any CPU
+		{82E8773F-8B80-44FC-8977-3DD21A199467}.Debug_macOS|Any CPU.Build.0 = Debug|Any CPU
 		{82E8773F-8B80-44FC-8977-3DD21A199467}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{82E8773F-8B80-44FC-8977-3DD21A199467}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{82E8773F-8B80-44FC-8977-3DD21A199467}.macOS|Any CPU.ActiveCfg = macOS|Any CPU
-		{82E8773F-8B80-44FC-8977-3DD21A199467}.macOS|Any CPU.Build.0 = macOS|Any CPU
+		{82E8773F-8B80-44FC-8977-3DD21A199467}.macOS|Any CPU.ActiveCfg = Release|Any CPU
+		{82E8773F-8B80-44FC-8977-3DD21A199467}.macOS|Any CPU.Build.0 = Release|Any CPU
+		{82E8773F-8B80-44FC-8977-3DD21A199467}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82E8773F-8B80-44FC-8977-3DD21A199467}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

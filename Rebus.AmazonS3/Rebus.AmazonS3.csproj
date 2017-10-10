@@ -65,7 +65,6 @@
     <Exec Command="$(ProjectDir)..\scripts\patch_assemblyinfo.cmd $(ProjectDir)" />
   </Target>
   <ItemGroup>
-    <Folder Include="AmazonS3\" />
     <Folder Include="AmazonS3\Core\" />
   </ItemGroup>
 </Project>

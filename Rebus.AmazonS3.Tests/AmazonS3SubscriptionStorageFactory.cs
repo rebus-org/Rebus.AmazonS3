@@ -9,17 +9,12 @@ namespace Rebus.AmazonS3.Tests
     {
         public ISubscriptionStorage Create()
         {
-            var consoleLoggerFactory = new ConsoleLoggerFactory(true);
-            var storage = new AmazonS3SubscriptionsStorage(null, consoleLoggerFactory);
-
-            //storage.EnsureTableIsCreated();
-
-            return storage;
+            var connectionInfo = AmazonS3ConnectionInfoUtil.ConnectionInfo.Value;
+            return new AmazonS3SubscriptionsStorage(connectionInfo.Credentials, connectionInfo.Config, new ConsoleLoggerFactory(false));
         }
 
         public void Cleanup()
         {
-            //SqlTestHelper.DropTable(TableName);
         }
     }
 }

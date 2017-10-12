@@ -114,12 +114,12 @@ namespace Rebus.AmazonS3.AmazonS3
                 }
                 catch (AmazonS3Exception e)
                 {
-                    if (e.StatusCode != HttpStatusCode.NotFound)
+                    if (e.StatusCode == HttpStatusCode.NotFound)
                     {
-                        throw new ArgumentException($"Could not locate an object with key {key} in bucket: {REBUS_SUBSCRIPTIONS_BUCKET}", e);
+                        return false;
                     }
 
-                    return false;
+                    throw new RebusApplicationException(e, "Unexpected exception occured");
                 }
                 catch (Exception e)
                 {
@@ -150,7 +150,7 @@ namespace Rebus.AmazonS3.AmazonS3
                 }
                 catch (AmazonS3Exception e)
                 {
-                    if (e.StatusCode != HttpStatusCode.NotFound)
+                    if (e.StatusCode == HttpStatusCode.NotFound)
                     {
                         throw new ArgumentException($"Could not locate an object with key {key} in bucket: {REBUS_SUBSCRIPTIONS_BUCKET}", e);
                     }

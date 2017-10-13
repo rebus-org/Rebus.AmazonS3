@@ -13,6 +13,7 @@ using System;
 using System.Net;
 using Rebus.Exceptions;
 using Amazon.S3.Util;
+using Rebus.Config;
 
 namespace Rebus.AmazonS3.AmazonS3
 {
@@ -23,15 +24,16 @@ namespace Rebus.AmazonS3.AmazonS3
     {
         private readonly AWSCredentials _awsCredentials;
         private readonly AmazonS3Config _awsConfig;
+        private readonly AmazonS3DataBusOptions _options;
         private readonly Func<IAmazonS3> _amazonS3Factory;
         private readonly ILog _log;
-        private const string REBUS_SUBSCRIPTIONS_BUCKET = "rebus-subscriptions";
 
-        public AmazonS3SubscriptionsStorage(AWSCredentials credentials, AmazonS3Config amazonS3Config, IRebusLoggerFactory rebusLoggerFactory)
+        public AmazonS3SubscriptionsStorage(AWSCredentials credentials, AmazonS3Config amazonS3Config, AmazonS3DataBusOptions options, IRebusLoggerFactory rebusLoggerFactory)
             : this(rebusLoggerFactory)
         {
             _awsCredentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
             _awsConfig = amazonS3Config ?? throw new ArgumentNullException(nameof(amazonS3Config));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public AmazonS3SubscriptionsStorage(Func<IAmazonS3> amazonS3Factory, IRebusLoggerFactory rebusLoggerFactory)
@@ -109,7 +111,7 @@ namespace Rebus.AmazonS3.AmazonS3
             {
                 try
                 {
-                    await s3Client.GetObjectMetadataAsync(REBUS_SUBSCRIPTIONS_BUCKET, key);
+                    await s3Client.GetObjectMetadataAsync(_options.BucketName, key);
                     return true;
                 }
                 catch (AmazonS3Exception e)
@@ -132,7 +134,7 @@ namespace Rebus.AmazonS3.AmazonS3
         {
             var request = new GetObjectRequest
             {
-                BucketName = REBUS_SUBSCRIPTIONS_BUCKET,
+                BucketName = _options.BucketName,
                 Key = key
             };
 
@@ -152,7 +154,7 @@ namespace Rebus.AmazonS3.AmazonS3
                 {
                     if (e.StatusCode == HttpStatusCode.NotFound)
                     {
-                        throw new ArgumentException($"Could not locate an object with key {key} in bucket: {REBUS_SUBSCRIPTIONS_BUCKET}", e);
+                        throw new ArgumentException($"Could not locate an object with key {key} in bucket: {_options.BucketName}", e);
                     }
 
                     throw new RebusApplicationException(e, "Unexpected exception occured");
@@ -170,7 +172,7 @@ namespace Rebus.AmazonS3.AmazonS3
             {
                 try
                 {
-                    if (await AmazonS3Util.DoesS3BucketExistAsync(s3Client, REBUS_SUBSCRIPTIONS_BUCKET))
+                    if (await AmazonS3Util.DoesS3BucketExistAsync(s3Client, _options.BucketName))
                     {
                         return;
                     }
@@ -184,7 +186,7 @@ namespace Rebus.AmazonS3.AmazonS3
                 {
                     await s3Client.PutBucketAsync(new PutBucketRequest
                     {
-                        BucketName = REBUS_SUBSCRIPTIONS_BUCKET,
+                        BucketName = _options.BucketName,
                         UseClientRegion = true
                     });
                 }
@@ -198,7 +200,7 @@ namespace Rebus.AmazonS3.AmazonS3
         {
             var request = new PutObjectRequest
             {
-                BucketName = REBUS_SUBSCRIPTIONS_BUCKET,
+                BucketName = _options.BucketName,
                 Key = key
             };
             request.ContentType = "application/json";

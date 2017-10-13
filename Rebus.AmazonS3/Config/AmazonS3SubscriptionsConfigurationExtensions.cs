@@ -28,13 +28,14 @@ namespace Rebus.Config
         /// Configures the storage of subscriptions in Amazon S3
         /// </summary>
         public static void StoreInAmazonS3(this StandardConfigurer<ISubscriptionStorage> configurer,
-           AWSCredentials credentials, AmazonS3Config config)
+           AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options)
         {
             if (configurer == null) throw new ArgumentNullException(nameof(configurer));
             if (credentials == null) throw new ArgumentNullException(nameof(credentials));
             if (config == null) throw new ArgumentNullException(nameof(config));
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
-            Configure(configurer, credentials, config);
+            Configure(configurer, credentials, config, options);
         }
 
         /// <summary>
@@ -47,7 +48,9 @@ namespace Rebus.Config
             if (secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
             if (regionEndpoint == null) throw new ArgumentNullException(nameof(regionEndpoint));
 
-            Configure(configurer, new BasicAWSCredentials(accessKeyId, secretAccessKey), new AmazonS3Config { RegionEndpoint = regionEndpoint });
+            AmazonS3DataBusOptions options = (bucketName != null) ? new AmazonS3DataBusOptions(bucketName) : null;
+
+            Configure(configurer, new BasicAWSCredentials(accessKeyId, secretAccessKey), new AmazonS3Config { RegionEndpoint = regionEndpoint }, options);
         }
 
         private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory)
@@ -55,9 +58,9 @@ namespace Rebus.Config
             configurer.Register(c => new AmazonS3SubscriptionsStorage(amazonS3Factory, c.Get<IRebusLoggerFactory>()));
         }
 
-        private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, AWSCredentials credentials, AmazonS3Config config)
+        private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options)
         {
-            configurer.Register(c => new AmazonS3SubscriptionsStorage(credentials, config, c.Get<IRebusLoggerFactory>()));
+            configurer.Register(c => new AmazonS3SubscriptionsStorage(credentials, config, options, c.Get<IRebusLoggerFactory>()));
         }
     }
 }

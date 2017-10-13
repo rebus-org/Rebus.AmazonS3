@@ -17,7 +17,6 @@ namespace Rebus.AmazonS3.Tests
             {
                 try
                 {
-                    Console.WriteLine(file);
                     return Tests.ConnectionInfo.CreateFromString(File.ReadAllText(file));
                 }
                 catch (Exception exception)
@@ -32,7 +31,6 @@ namespace Rebus.AmazonS3.Tests
             {
                 try
                 {
-                    Console.WriteLine(env);
                     return Tests.ConnectionInfo.CreateFromString(env);
                 }
                 catch (Exception exception)

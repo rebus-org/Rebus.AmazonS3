@@ -54,12 +54,11 @@ namespace Rebus.AmazonS3.AmazonS3
 
         public async Task<string[]> GetSubscriberAddresses(string topic)
         {
-            await EnsureBucketExist();
+            await EnsureBucketExistAsync();
 
             var subscriptions = await GetSubscriptions(topic);
 
-            HashSet<string> subscribers;
-            if(subscriptions.TryGetValue(topic, out subscribers))
+            if(subscriptions.TryGetValue(topic, out var subscribers))
                 return subscribers.ToArray();
 
             return new string[0];
@@ -67,7 +66,7 @@ namespace Rebus.AmazonS3.AmazonS3
 
         public async Task RegisterSubscriber(string topic, string subscriberAddress)
         {
-            await EnsureBucketExist();
+            await EnsureBucketExistAsync();
 
             var subscriptions = await GetSubscriptions(topic);
 
@@ -75,12 +74,12 @@ namespace Rebus.AmazonS3.AmazonS3
                 .GetOrAdd(topic, () => new HashSet<string>())
                 .Add(subscriberAddress);
 
-            await SaveToS3(subscriptions, topic);
+            await SaveToS3Async(subscriptions, topic);
         }
 
         public async Task UnregisterSubscriber(string topic, string subscriberAddress)
         {
-            await EnsureBucketExist();
+            await EnsureBucketExistAsync();
 
             var subscriptions = await GetSubscriptions(topic);
 
@@ -88,14 +87,14 @@ namespace Rebus.AmazonS3.AmazonS3
                 .GetOrAdd(topic, () => new HashSet<string>())
                 .Remove(subscriberAddress);
 
-            await SaveToS3(subscriptions, topic);
+            await SaveToS3Async(subscriptions, topic);
         }
 
         private async Task<Dictionary<string, HashSet<string>>> GetSubscriptions(string topic)
         {
-            if (await ObjectExists(topic))
+            if (await ObjectExistsAsync(topic))
             {
-                string jsonText = await FetchFromS3(topic);
+                string jsonText = await FetchFromS3Async(topic);
 
                 var subscriptions = JsonConvert.DeserializeObject<Dictionary<string, HashSet<string>>>(jsonText);
 
@@ -105,7 +104,7 @@ namespace Rebus.AmazonS3.AmazonS3
             return new Dictionary<string, HashSet<string>>();
         }
 
-        private async Task<bool> ObjectExists(string key)
+        private async Task<bool> ObjectExistsAsync(string key)
         {
             using (IAmazonS3 s3Client = CreateS3Client())
             {
@@ -130,7 +129,7 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task<string> FetchFromS3(string key)
+        private async Task<string> FetchFromS3Async(string key)
         {
             var request = new GetObjectRequest
             {
@@ -146,7 +145,7 @@ namespace Rebus.AmazonS3.AmazonS3
                     {
                         using (StreamReader reader = new StreamReader(response.ResponseStream))
                         {
-                            return reader.ReadToEnd();
+                            return await reader.ReadToEndAsync();
                         }
                     }
                 }
@@ -166,7 +165,7 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task EnsureBucketExist()
+        private async Task EnsureBucketExistAsync()
         {
             using (IAmazonS3 s3Client = CreateS3Client())
             {
@@ -196,7 +195,7 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task SaveToS3<T>(T data, string key)
+        private async Task SaveToS3Async<T>(T data, string key)
         {
             var request = new PutObjectRequest
             {

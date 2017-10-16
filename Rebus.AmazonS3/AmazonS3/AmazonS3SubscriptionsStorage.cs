@@ -225,7 +225,5 @@ namespace Rebus.AmazonS3.AmazonS3
 
             return new AmazonS3Client(_awsCredentials, _awsConfig);
         }
-
-        //TODO: remove me! Testing unit test on CI build 
     }
 }

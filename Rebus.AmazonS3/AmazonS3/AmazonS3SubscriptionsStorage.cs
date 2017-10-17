@@ -4,11 +4,8 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Rebus.Logging;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Linq;
-using Rebus.Extensions;
 using Amazon.S3.Model;
-using System.IO;
 using System;
 using System.Net;
 using Rebus.Exceptions;
@@ -59,51 +56,59 @@ namespace Rebus.AmazonS3.AmazonS3
 
             var subscriptions = await GetSubscriptions(topic);
 
-            if (subscriptions.TryGetValue(topic, out var subscribers))
-                return subscribers.ToArray();
-
-            return new string[0];
+            return subscriptions.ToArray();
         }
 
         public async Task RegisterSubscriber(string topic, string subscriberAddress)
         {
             await EnsureBucketExistAsync();
 
-            var subscriptions = await GetSubscriptions(topic);
+            string key = $"{topic}/{subscriberAddress}";
 
-            subscriptions
-                .GetOrAdd(topic, () => new HashSet<string>())
-                .Add(subscriberAddress);
-
-            await SaveToS3Async(subscriptions, topic);
+            await PutObjectAsync(key);
         }
 
         public async Task UnregisterSubscriber(string topic, string subscriberAddress)
         {
             await EnsureBucketExistAsync();
 
-            var subscriptions = await GetSubscriptions(topic);
+            string key = $"{topic}/{subscriberAddress}";
 
-            subscriptions
-                .GetOrAdd(topic, () => new HashSet<string>())
-                .Remove(subscriberAddress);
-
-            await SaveToS3Async(subscriptions, topic);
+            await DeleteObjectAsync(key);
         }
 
-        private async Task<Dictionary<string, HashSet<string>>> GetSubscriptions(string topic)
+        private async Task<IList<string>> GetSubscriptions(string topic)
         {
-            if (await ObjectExistsAsync(topic))
+            var topicKeys = await GetKeysForPrefix(topic);
+
+            var keys = topicKeys.Select(k => k.Substring(k.LastIndexOf('/') + 1));
+
+            return keys.ToList();
+        }
+
+        private async Task<IList<string>> GetKeysForPrefix(string prefix)
+        {
+            var keys = new List<string>();
+
+            var request = new ListObjectsRequest
             {
-                string jsonText = await FetchFromS3Async(topic);
+                BucketName = _options.BucketName,
+                Prefix = prefix
+            };
 
-                var subscriptions = JsonConvert.DeserializeObject<Dictionary<string, HashSet<string>>>(jsonText);
+            using (var client = CreateS3Client())
+            {
+                ListObjectsResponse response = await client.ListObjectsAsync(request);
 
-                return subscriptions;
+                foreach (S3Object obj in response.S3Objects)
+                {
+                    keys.Add(obj.Key);
+                }
             }
 
-            return new Dictionary<string, HashSet<string>>();
+            return keys;
         }
+
 
         private async Task<bool> ObjectExistsAsync(string key)
         {
@@ -119,42 +124,6 @@ namespace Rebus.AmazonS3.AmazonS3
                     if (e.StatusCode == HttpStatusCode.NotFound)
                     {
                         return false;
-                    }
-
-                    throw new RebusApplicationException(e, "Unexpected exception occured");
-                }
-                catch (Exception e)
-                {
-                    throw new RebusApplicationException(e, "Unexpected exception occured");
-                }
-            }
-        }
-
-        private async Task<string> FetchFromS3Async(string key)
-        {
-            var request = new GetObjectRequest
-            {
-                BucketName = _options.BucketName,
-                Key = key
-            };
-
-            using (IAmazonS3 s3Client = CreateS3Client())
-            {
-                try
-                {
-                    using (var response = await s3Client.GetObjectAsync(request))
-                    {
-                        using (StreamReader reader = new StreamReader(response.ResponseStream))
-                        {
-                            return await reader.ReadToEndAsync();
-                        }
-                    }
-                }
-                catch (AmazonS3Exception e)
-                {
-                    if (e.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        throw new ArgumentException($"Could not locate an object with key {key} in bucket: {_options.BucketName}", e);
                     }
 
                     throw new RebusApplicationException(e, "Unexpected exception occured");
@@ -196,25 +165,45 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task SaveToS3Async<T>(T data, string key)
+        private async Task PutObjectAsync(string key)
         {
             var request = new PutObjectRequest
             {
                 BucketName = _options.BucketName,
                 Key = key
             };
-            request.ContentType = "application/json";
-            request.ContentBody = JsonConvert.SerializeObject(data);
-
-            using (IAmazonS3 s3Client = CreateS3Client())
+            using (var client = CreateS3Client())
             {
                 try
                 {
-                    await s3Client.PutObjectAsync(request);
+                    await client.PutObjectAsync(request);
                 }
                 catch (Exception e)
                 {
                     throw new RebusApplicationException(e, "Unexpected exception occured");
+                }
+            }
+        }
+
+        private async Task DeleteObjectAsync(string key)
+        {
+            if (await ObjectExistsAsync(key))
+            {
+                var request = new DeleteObjectRequest
+                {
+                    BucketName = _options.BucketName,
+                    Key = key
+                };
+                using (var client = CreateS3Client())
+                {
+                    try
+                    {
+                        await client.DeleteObjectAsync(request);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RebusApplicationException(e, "Unexpected exception occured");
+                    }
                 }
             }
         }

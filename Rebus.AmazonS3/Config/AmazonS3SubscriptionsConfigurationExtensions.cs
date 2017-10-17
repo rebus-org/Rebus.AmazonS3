@@ -17,11 +17,12 @@ namespace Rebus.Config
         /// <summary>
         /// Configures the storage of subscriptions in Amazon S3
         /// </summary>
-        public static void StoreInAmazonS3(this StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory)
+        public static void StoreInAmazonS3(this StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options)
         {
             if (amazonS3Factory == null) throw new ArgumentNullException(nameof(amazonS3Factory));
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
-            Configure(configurer, amazonS3Factory);
+            Configure(configurer, amazonS3Factory, options);
         }
 
         /// <summary>
@@ -53,9 +54,9 @@ namespace Rebus.Config
             Configure(configurer, new BasicAWSCredentials(accessKeyId, secretAccessKey), new AmazonS3Config { RegionEndpoint = regionEndpoint }, options);
         }
 
-        private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory)
+        private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options)
         {
-            configurer.Register(c => new AmazonS3SubscriptionsStorage(amazonS3Factory, c.Get<IRebusLoggerFactory>()));
+            configurer.Register(c => new AmazonS3SubscriptionsStorage(amazonS3Factory, options, c.Get<IRebusLoggerFactory>()));
         }
 
         private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options)

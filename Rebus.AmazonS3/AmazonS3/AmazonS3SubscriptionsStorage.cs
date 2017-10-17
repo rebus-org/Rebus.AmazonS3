@@ -36,9 +36,10 @@ namespace Rebus.AmazonS3.AmazonS3
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public AmazonS3SubscriptionsStorage(Func<IAmazonS3> amazonS3Factory, IRebusLoggerFactory rebusLoggerFactory)
+        public AmazonS3SubscriptionsStorage(Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options, IRebusLoggerFactory rebusLoggerFactory)
             : this(rebusLoggerFactory)
         {
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _amazonS3Factory = amazonS3Factory;
         }
 
@@ -58,7 +59,7 @@ namespace Rebus.AmazonS3.AmazonS3
 
             var subscriptions = await GetSubscriptions(topic);
 
-            if(subscriptions.TryGetValue(topic, out var subscribers))
+            if (subscriptions.TryGetValue(topic, out var subscribers))
                 return subscribers.ToArray();
 
             return new string[0];

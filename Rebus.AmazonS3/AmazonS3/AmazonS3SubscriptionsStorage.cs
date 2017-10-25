@@ -89,6 +89,7 @@ namespace Rebus.AmazonS3.AmazonS3
                     new KeyVersion() { Key = "topic2/subscriber1" },
                     new KeyVersion() { Key = "topic3/subscriber1" },
                     new KeyVersion() { Key = "known id" }
+
                 }
             };
 

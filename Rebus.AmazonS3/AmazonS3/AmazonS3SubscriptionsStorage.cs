@@ -85,7 +85,10 @@ namespace Rebus.AmazonS3.AmazonS3
                 BucketName = _options.BucketName,
                 Objects = new List<KeyVersion>
                 {
-                    new KeyVersion() { Key = $"topic1/subscriber2" }
+                    new KeyVersion() { Key = "topic1/subscriber2" },
+                    new KeyVersion() { Key = "topic2/subscriber1" },
+                    new KeyVersion() { Key = "topic3/subscriber1" },
+                    new KeyVersion() { Key = "known id" }
                 }
             };
 

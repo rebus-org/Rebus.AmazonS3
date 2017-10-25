@@ -98,7 +98,7 @@ namespace Rebus.AmazonS3.AmazonS3
                         return client.DeleteObjectsAsync(request);
                     });
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
             }

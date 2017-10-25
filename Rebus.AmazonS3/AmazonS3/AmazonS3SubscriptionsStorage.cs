@@ -11,6 +11,7 @@ using System.Net;
 using Rebus.Exceptions;
 using Amazon.S3.Util;
 using Rebus.Config;
+using System.Threading;
 
 namespace Rebus.AmazonS3.AmazonS3
 {
@@ -75,6 +76,32 @@ namespace Rebus.AmazonS3.AmazonS3
             string key = $"{topic}/{subscriberAddress}";
 
             await DeleteObjectAsync(key);
+        }
+
+        public void Cleanup()
+        {
+            var request = new DeleteObjectsRequest
+            {
+                BucketName = _options.BucketName,
+                Objects = new List<KeyVersion>
+                {
+                    new KeyVersion() { Key = $"topic1/subscriber2" }
+                }
+            };
+
+            using (var client = new AmazonS3Client(_awsCredentials, _awsConfig))
+            {
+                try
+                {
+                    AsyncHelper.RunSync(() =>
+                    {
+                        return client.DeleteObjectsAsync(request);
+                    });
+                }
+                catch (Exception e)
+                {
+                }
+            }
         }
 
         private async Task<IList<string>> GetSubscriptions(string topic)
@@ -214,6 +241,24 @@ namespace Rebus.AmazonS3.AmazonS3
                 return _amazonS3Factory();
 
             return new AmazonS3Client(_awsCredentials, _awsConfig);
+        }
+
+        private static class AsyncHelper
+        {
+            private static readonly TaskFactory _myTaskFactory = new
+              TaskFactory(CancellationToken.None,
+                          TaskCreationOptions.None,
+                          TaskContinuationOptions.None,
+                          TaskScheduler.Default);
+
+            public static void RunSync(Func<Task> func)
+            {
+                _myTaskFactory
+                  .StartNew(func)
+                  .Unwrap()
+                  .GetAwaiter()
+                  .GetResult();
+            }
         }
     }
 }

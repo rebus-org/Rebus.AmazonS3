@@ -9,12 +9,20 @@ namespace Rebus.AmazonS3.Tests
     {
         public ISubscriptionStorage Create()
         {
-            var connectionInfo = AmazonS3ConnectionInfoUtil.ConnectionInfo.Value;
-            return new AmazonS3SubscriptionsStorage(connectionInfo.Credentials, connectionInfo.Config, connectionInfo.Options, new ConsoleLoggerFactory(false));
+            Cleanup();
+            return CreateInstance();
         }
 
         public void Cleanup()
         {
+            var subStorage = CreateInstance();
+            subStorage.Cleanup();
+        }
+
+        private AmazonS3SubscriptionsStorage CreateInstance()
+        {
+            var connectionInfo = AmazonS3ConnectionInfoUtil.ConnectionInfo.Value;
+            return new AmazonS3SubscriptionsStorage(connectionInfo.Credentials, connectionInfo.Config, connectionInfo.Options, new ConsoleLoggerFactory(false));
         }
     }
 }

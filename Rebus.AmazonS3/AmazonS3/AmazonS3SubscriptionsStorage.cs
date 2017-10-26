@@ -136,7 +136,7 @@ namespace Rebus.AmazonS3.AmazonS3
         {
             var topicKeys = await GetKeysForPrefix(topic);
 
-            var keys = topicKeys.Select(k => k.Substring(k.LastIndexOf('/') + 1));
+            var keys = topicKeys.Select(k => k.Substring(topic.Length + 1));
 
             return keys.ToList();
         }

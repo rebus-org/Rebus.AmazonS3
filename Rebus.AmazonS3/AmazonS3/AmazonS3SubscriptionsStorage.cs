@@ -80,31 +80,55 @@ namespace Rebus.AmazonS3.AmazonS3
 
         public void Cleanup()
         {
-            var request = new DeleteObjectsRequest
+            using (var client = CreateS3Client())
             {
-                BucketName = _options.BucketName,
-                Objects = new List<KeyVersion>
-                {
-                    new KeyVersion() { Key = "topic1/subscriber2" },
-                    new KeyVersion() { Key = "topic2/subscriber1" },
-                    new KeyVersion() { Key = "topic3/subscriber1" },
-                    new KeyVersion() { Key = "known id" }
+                IList<string> keys = GetObjectKeys(client);
 
-                }
+                DeleteObjects(client, keys);
+            }
+        }
+
+        private List<string> GetObjectKeys(IAmazonS3 client)
+        {
+            var keys = new List<string>();
+            var listRequest = new ListObjectsRequest
+            {
+                BucketName = _options.BucketName
             };
 
-            using (var client = new AmazonS3Client(_awsCredentials, _awsConfig))
+            var response = AsyncHelper.RunSync(() =>
             {
-                try
+                return client.ListObjectsAsync(listRequest);
+            });
+
+            foreach (S3Object obj in response.S3Objects)
+            {
+                keys.Add(obj.Key);
+            }
+
+            return keys;
+        }
+
+        private void DeleteObjects(IAmazonS3 client, IList<string> keys)
+        {
+            var objects = new List<KeyVersion>();
+            foreach (string key in keys)
+            {
+                objects.Add(new KeyVersion { Key = key });
+            }
+
+            if (objects.Count > 0)
+            {
+                var request = new DeleteObjectsRequest
                 {
-                    AsyncHelper.RunSync(() =>
-                    {
-                        return client.DeleteObjectsAsync(request);
-                    });
-                }
-                catch (Exception)
+                    BucketName = _options.BucketName,
+                    Objects = objects
+                };
+
+                AsyncHelper.RunSync(() =>
                 {
-                }
+                    return client.DeleteObjectsAsync(request);
+                });
             }
         }
 
@@ -255,10 +279,17 @@ namespace Rebus.AmazonS3.AmazonS3
                           TaskContinuationOptions.None,
                           TaskScheduler.Default);
 
+            public static TResult RunSync<TResult>(Func<Task<TResult>> func)
+            {
+                return _myTaskFactory.StartNew(func)
+                  .Unwrap()
+                  .GetAwaiter()
+                  .GetResult();
+            }
+
             public static void RunSync(Func<Task> func)
             {
-                _myTaskFactory
-                  .StartNew(func)
+                _myTaskFactory.StartNew(func)
                   .Unwrap()
                   .GetAwaiter()
                   .GetResult();

@@ -9,14 +9,13 @@ namespace Rebus.AmazonS3.Tests
     {
         public ISubscriptionStorage Create()
         {
-            Cleanup();
             return CreateInstance();
         }
 
         public void Cleanup()
         {
-            var subStorage = CreateInstance();
-            subStorage.Cleanup();
+            var connectionInfo = AmazonS3ConnectionInfoUtil.ConnectionInfo.Value;
+            new CleanupUtil(connectionInfo).Cleanup();
         }
 
         private AmazonS3SubscriptionsStorage CreateInstance()

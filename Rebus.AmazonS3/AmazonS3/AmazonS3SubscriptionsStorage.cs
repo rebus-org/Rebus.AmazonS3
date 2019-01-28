@@ -1,55 +1,42 @@
-﻿using System.Threading.Tasks;
-using Rebus.Subscriptions;
-using Amazon.Runtime;
-using Amazon.S3;
-using Rebus.Logging;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Amazon.S3.Model;
-using System;
 using System.Net;
-using Rebus.Exceptions;
+using System.Threading.Tasks;
+using Amazon.Runtime;
+using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Util;
 using Rebus.Config;
-using System.Threading;
+using Rebus.Exceptions;
+using Rebus.Subscriptions;
 
-namespace Rebus.AmazonS3.AmazonS3
+namespace Rebus.AmazonS3
 {
     /// <summary>
     /// Implementation of <see cref="ISubscriptionStorage"/> that stores subscriptions in Amazon S3
     /// </summary>
-    internal class AmazonS3SubscriptionsStorage : ISubscriptionStorage
+    class AmazonS3SubscriptionsStorage : ISubscriptionStorage
     {
-        private readonly AWSCredentials _awsCredentials;
-        private readonly AmazonS3Config _awsConfig;
-        private readonly AmazonS3DataBusOptions _options;
-        private readonly Func<IAmazonS3> _amazonS3Factory;
-        private readonly ILog _log;
+        readonly AWSCredentials _awsCredentials;
+        readonly AmazonS3Config _awsConfig;
+        readonly AmazonS3DataBusOptions _options;
+        readonly Func<IAmazonS3> _amazonS3Factory;
 
-        public AmazonS3SubscriptionsStorage(AWSCredentials credentials, AmazonS3Config amazonS3Config, AmazonS3DataBusOptions options, IRebusLoggerFactory rebusLoggerFactory)
-            : this(rebusLoggerFactory)
+        public AmazonS3SubscriptionsStorage(AWSCredentials credentials, AmazonS3Config amazonS3Config, AmazonS3DataBusOptions options)
         {
             _awsCredentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
             _awsConfig = amazonS3Config ?? throw new ArgumentNullException(nameof(amazonS3Config));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public AmazonS3SubscriptionsStorage(Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options, IRebusLoggerFactory rebusLoggerFactory)
-            : this(rebusLoggerFactory)
+        public AmazonS3SubscriptionsStorage(Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _amazonS3Factory = amazonS3Factory;
         }
 
-        private AmazonS3SubscriptionsStorage(IRebusLoggerFactory rebusLoggerFactory)
-        {
-            _log = rebusLoggerFactory?.GetLogger<AmazonS3SubscriptionsStorage>() ?? throw new ArgumentNullException(nameof(rebusLoggerFactory));
-        }
-
-        public bool IsCentralized
-        {
-            get { return true; }
-        }
+        public bool IsCentralized => true;
 
         public async Task<string[]> GetSubscriberAddresses(string topic)
         {
@@ -78,7 +65,7 @@ namespace Rebus.AmazonS3.AmazonS3
             await DeleteObjectAsync(key);
         }
 
-        private async Task<IList<string>> GetSubscriptions(string topic)
+        async Task<IList<string>> GetSubscriptions(string topic)
         {
             var topicKeys = await GetKeysForPrefix(topic);
 
@@ -87,7 +74,7 @@ namespace Rebus.AmazonS3.AmazonS3
             return keys.ToList();
         }
 
-        private async Task<IList<string>> GetKeysForPrefix(string prefix)
+        async Task<IList<string>> GetKeysForPrefix(string prefix)
         {
             var keys = new List<string>();
 
@@ -110,7 +97,7 @@ namespace Rebus.AmazonS3.AmazonS3
             return keys;
         }
 
-        private async Task<bool> ObjectExistsAsync(string key)
+        async Task<bool> ObjectExistsAsync(string key)
         {
             using (IAmazonS3 s3Client = CreateS3Client())
             {
@@ -135,7 +122,7 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task EnsureBucketExistAsync()
+        async Task EnsureBucketExistAsync()
         {
             using (IAmazonS3 s3Client = CreateS3Client())
             {
@@ -165,7 +152,7 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task PutObjectAsync(string key)
+        async Task PutObjectAsync(string key)
         {
             var request = new PutObjectRequest
             {
@@ -185,7 +172,7 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private async Task DeleteObjectAsync(string key)
+        async Task DeleteObjectAsync(string key)
         {
             if (await ObjectExistsAsync(key))
             {
@@ -208,12 +195,6 @@ namespace Rebus.AmazonS3.AmazonS3
             }
         }
 
-        private IAmazonS3 CreateS3Client()
-        {
-            if (_amazonS3Factory != null)
-                return _amazonS3Factory();
-
-            return new AmazonS3Client(_awsCredentials, _awsConfig);
-        }
+        IAmazonS3 CreateS3Client() => _amazonS3Factory?.Invoke() ?? new AmazonS3Client(_awsCredentials, _awsConfig);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Rebus.DataBus;
 
 namespace Rebus.Config
 {
@@ -33,6 +34,11 @@ namespace Rebus.Config
         /// Optional prefix for object keys
         /// </summary>
         public string ObjectKeyPrefix { get; set; }
+
+        /// <summary>
+        /// If true, the <see cref="MetadataKeys.ReadTime"/> metadata key will NOT be updated on each read operation. This will save some requests
+        /// </summary>
+        public bool DoNotUpdateLastReadTime { get; set; }
 
         /// <summary>
         /// Optional postfix for object keys

@@ -1,6 +1,4 @@
-﻿using Rebus.AmazonS3.AmazonS3;
-using Rebus.Logging;
-using Rebus.Subscriptions;
+﻿using Rebus.Subscriptions;
 using Rebus.Tests.Contracts.Subscriptions;
 
 namespace Rebus.AmazonS3.Tests
@@ -21,7 +19,7 @@ namespace Rebus.AmazonS3.Tests
         private AmazonS3SubscriptionsStorage CreateInstance()
         {
             var connectionInfo = AmazonS3ConnectionInfoUtil.ConnectionInfo.Value;
-            return new AmazonS3SubscriptionsStorage(connectionInfo.Credentials, connectionInfo.Config, connectionInfo.Options, new ConsoleLoggerFactory(false));
+            return new AmazonS3SubscriptionsStorage(connectionInfo.Credentials, connectionInfo.Config, connectionInfo.Options);
         }
     }
 }

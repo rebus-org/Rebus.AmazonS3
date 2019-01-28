@@ -6,6 +6,10 @@
 * Move configuration extensions into `Rebus.Config` namespace to help non-R# users, who are to be considered friends anyway
 * Various improvements - thanks [alexanderyaremchuk]
 
+## 1.1.0
+
+* Add configuration option to disable updating "last read time" of data bus attachments. Can be used to reduce the number of requests to S3, so if your application is read attachments a lot, then this is recommended.
+
 ---
 
 [alexanderyaremchuk]: https://github.com/alexanderyaremchuk

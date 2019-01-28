@@ -22,14 +22,14 @@ namespace Rebus.AmazonS3
     /// <summary>
     /// Implementation of <see cref="IDataBusStorage"/> that stores data in Amazon S3
     /// </summary>
-    internal class AmazonS3DataBusStorage : IDataBusStorage
+    class AmazonS3DataBusStorage : IDataBusStorage
     {
-        private readonly AWSCredentials _credentials;
-        private readonly AmazonS3Config _amazonS3Config;
-        private readonly TransferUtilityConfig _transferUtilityConfig;
-        private readonly AmazonS3DataBusOptions _options;
-        private readonly ILog _log;
-        private readonly S3MetadataCollectionFactory _metadataCollectionFactory;
+        readonly AWSCredentials _credentials;
+        readonly AmazonS3Config _amazonS3Config;
+        readonly TransferUtilityConfig _transferUtilityConfig;
+        readonly AmazonS3DataBusOptions _options;
+        readonly S3MetadataCollectionFactory _metadataCollectionFactory;
+        readonly ILog _log;
 
         public AmazonS3DataBusStorage(
             AWSCredentials credentials, 
@@ -108,7 +108,7 @@ namespace Rebus.AmazonS3
             });
         }
 
-        private async Task EnsureBucketExistsAsync()
+        async Task EnsureBucketExistsAsync()
         {
             try
             {
@@ -145,8 +145,10 @@ namespace Rebus.AmazonS3
             }
         }
 
-        private async Task UpdateReadTimeAsync(ObjectIdentity identity, IAmazonS3 s3Client)
+        async Task UpdateReadTimeAsync(ObjectIdentity identity, IAmazonS3 s3Client)
         {
+            if (_options.DoNotUpdateLastReadTime) return;
+
             var metadataCollection = await GetObjectMetadataAsync(s3Client, identity, false);
             metadataCollection[MetadataKeys.ReadTime] = RebusTime.Now.ToString("O");
             var copyObjectRequest = new CopyObjectRequest
@@ -161,7 +163,7 @@ namespace Rebus.AmazonS3
             await s3Client.CopyObjectAsync(copyObjectRequest);
         }
 
-        private async Task<S3MetadataCollection> GetObjectMetadataAsync(IAmazonS3 s3Client, ObjectIdentity identity, bool addContentLength)
+        async Task<S3MetadataCollection> GetObjectMetadataAsync(IAmazonS3 s3Client, ObjectIdentity identity, bool addContentLength)
         {
             var metadataResponse = await s3Client.GetObjectMetadataAsync(new GetObjectMetadataRequest
             {
@@ -180,12 +182,12 @@ namespace Rebus.AmazonS3
             return metadataCollection;
         }
 
-        private AmazonS3Client CreateS3Client()
+        AmazonS3Client CreateS3Client()
         {
             return new AmazonS3Client(_credentials, _amazonS3Config);
         }
 
-        private ITransferUtility CreateTransferUtility(AmazonS3Client s3Client = null)
+        ITransferUtility CreateTransferUtility(AmazonS3Client s3Client = null)
         {
             if (s3Client == null)
             {
@@ -194,7 +196,7 @@ namespace Rebus.AmazonS3
             return new TransferUtility(s3Client, _transferUtilityConfig);
         }
 
-        private async Task<T> TryCatchAsync<T>(string id, Func<ObjectIdentity,Task<T>> asyncFunc)
+        async Task<T> TryCatchAsync<T>(string id, Func<ObjectIdentity,Task<T>> asyncFunc)
         {
             try
             {

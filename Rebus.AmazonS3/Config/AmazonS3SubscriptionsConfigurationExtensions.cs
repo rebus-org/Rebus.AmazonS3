@@ -2,10 +2,10 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Transfer;
-using Rebus.AmazonS3.AmazonS3;
-using Rebus.Logging;
 using Rebus.Subscriptions;
 using System;
+using Rebus.AmazonS3;
+// ReSharper disable UnusedMember.Global
 
 namespace Rebus.Config
 {
@@ -49,19 +49,19 @@ namespace Rebus.Config
             if (secretAccessKey == null) throw new ArgumentNullException(nameof(secretAccessKey));
             if (regionEndpoint == null) throw new ArgumentNullException(nameof(regionEndpoint));
 
-            AmazonS3DataBusOptions options = (bucketName != null) ? new AmazonS3DataBusOptions(bucketName) : null;
+            var options = bucketName != null ? new AmazonS3DataBusOptions(bucketName) : null;
 
             Configure(configurer, new BasicAWSCredentials(accessKeyId, secretAccessKey), new AmazonS3Config { RegionEndpoint = regionEndpoint }, options);
         }
 
-        private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options)
+        static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, Func<IAmazonS3> amazonS3Factory, AmazonS3DataBusOptions options)
         {
-            configurer.Register(c => new AmazonS3SubscriptionsStorage(amazonS3Factory, options, c.Get<IRebusLoggerFactory>()));
+            configurer.Register(c => new AmazonS3SubscriptionsStorage(amazonS3Factory, options));
         }
 
-        private static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options)
+        static void Configure(StandardConfigurer<ISubscriptionStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options)
         {
-            configurer.Register(c => new AmazonS3SubscriptionsStorage(credentials, config, options, c.Get<IRebusLoggerFactory>()));
+            configurer.Register(c => new AmazonS3SubscriptionsStorage(credentials, config, options));
         }
     }
 }

@@ -8,8 +8,8 @@ namespace Rebus.AmazonS3.Tests.Core
     [TestFixture]
     public class KnownKeyEncoderTest
     {
-        private const string KnownKey = "This Is A Known Key";
-        private KnownKeyEncoder _knownKeyEncoder;
+        const string KnownKey = "This Is A Known Key";
+        KnownKeyEncoder _knownKeyEncoder;
 
         [SetUp]
         public void Setup()

@@ -6,6 +6,8 @@ using Amazon.S3.Transfer;
 using Rebus.AmazonS3;
 using Rebus.DataBus;
 using Rebus.Logging;
+using Rebus.Time;
+// ReSharper disable UnusedMember.Global
 
 namespace Rebus.Config
 {
@@ -40,16 +42,22 @@ namespace Rebus.Config
 
 
             Configure(
-                configurer, 
+                configurer,
                 new BasicAWSCredentials(accessKeyId, secretAccessKey),
-                new AmazonS3Config { RegionEndpoint = regionEndpoint }, 
+                new AmazonS3Config { RegionEndpoint = regionEndpoint },
                 new AmazonS3DataBusOptions(bucketName),
                 transferUtilityConfig ?? new TransferUtilityConfig());
         }
 
-        private static void Configure(StandardConfigurer<IDataBusStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options, TransferUtilityConfig transferUtilityConfig)
+        static void Configure(StandardConfigurer<IDataBusStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options, TransferUtilityConfig transferUtilityConfig)
         {
-            configurer.Register(c => new AmazonS3DataBusStorage(credentials, config, options, transferUtilityConfig, c.Get<IRebusLoggerFactory>()));
+            configurer.Register(c =>
+            {
+                var rebusLoggerFactory = c.Get<IRebusLoggerFactory>();
+                var rebusTime = c.Get<IRebusTime>();
+
+                return new AmazonS3DataBusStorage(credentials, config, options, transferUtilityConfig, rebusLoggerFactory, rebusTime);
+            });
         }
     }
 }

@@ -27,6 +27,7 @@ namespace Rebus.AmazonS3
         readonly AWSCredentials _credentials;
         readonly AmazonS3Config _amazonS3Config;
         readonly TransferUtilityConfig _transferUtilityConfig;
+        readonly IRebusTime _rebusTime;
         readonly AmazonS3DataBusOptions _options;
         readonly S3MetadataCollectionFactory _metadataCollectionFactory;
         readonly ILog _log;
@@ -36,11 +37,13 @@ namespace Rebus.AmazonS3
             AmazonS3Config amazonS3Config, 
             AmazonS3DataBusOptions options, 
             TransferUtilityConfig transferUtilityConfig, 
-            IRebusLoggerFactory rebusLoggerFactory)
+            IRebusLoggerFactory rebusLoggerFactory,
+            IRebusTime rebusTime)
         {
             _credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
             _amazonS3Config = amazonS3Config ?? throw new ArgumentNullException(nameof(amazonS3Config));
             _transferUtilityConfig = transferUtilityConfig ?? throw new ArgumentNullException(nameof(transferUtilityConfig));
+            _rebusTime = rebusTime ?? throw new ArgumentNullException(nameof(rebusTime));
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _log = rebusLoggerFactory?.GetLogger<AmazonS3DataBusStorage>() ?? throw new ArgumentNullException(nameof(rebusLoggerFactory));
             _metadataCollectionFactory = new S3MetadataCollectionFactory(options);
@@ -59,7 +62,7 @@ namespace Rebus.AmazonS3
                 {
                     var metadataCollection = _metadataCollectionFactory.Create();
                     metadataCollection.AddRange(metadata);
-                    metadataCollection[MetadataKeys.SaveTime] = RebusTime.Now.ToString("O");
+                    metadataCollection[MetadataKeys.SaveTime] = _rebusTime.Now.ToString("O");
 
                     var uploadRequest = new TransferUtilityUploadRequest
                     {
@@ -150,7 +153,7 @@ namespace Rebus.AmazonS3
             if (_options.DoNotUpdateLastReadTime) return;
 
             var metadataCollection = await GetObjectMetadataAsync(s3Client, identity, false);
-            metadataCollection[MetadataKeys.ReadTime] = RebusTime.Now.ToString("O");
+            metadataCollection[MetadataKeys.ReadTime] = _rebusTime.Now.ToString("O");
             var copyObjectRequest = new CopyObjectRequest
             {
                 SourceBucket = _options.BucketName,

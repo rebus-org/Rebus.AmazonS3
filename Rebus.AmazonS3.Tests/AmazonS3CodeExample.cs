@@ -4,7 +4,6 @@ using Amazon.S3;
 using NUnit.Framework;
 using Rebus.Activation;
 using Rebus.Config;
-using Rebus.DataBus;
 using Rebus.Tests.Contracts;
 using Rebus.Transport.InMem;
 
@@ -23,7 +22,7 @@ namespace Rebus.AmazonS3.Tests
 
             Configure.With(activator)
                 .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "api-tjek"))
-                .Options(o =>
+                .DataBus(d =>
                 {
                     var options = new AmazonS3DataBusOptions("my-bucket")
                     {
@@ -33,7 +32,7 @@ namespace Rebus.AmazonS3.Tests
                     var credentials = new BasicAWSCredentials("access-key", "secret-key");
                     var config = new AmazonS3Config();
 
-                    o.EnableDataBus().StoreInAmazonS3(credentials, config, options);
+                    d.StoreInAmazonS3(credentials, config, options);
                 })
                 .Start();
         }

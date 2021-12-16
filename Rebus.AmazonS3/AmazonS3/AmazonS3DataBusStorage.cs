@@ -54,6 +54,28 @@ namespace Rebus.AmazonS3
             }
         }
 
+        public AmazonS3DataBusStorage(
+            AmazonS3Config amazonS3Config, 
+            AmazonS3DataBusOptions options, 
+            TransferUtilityConfig transferUtilityConfig, 
+            IRebusLoggerFactory rebusLoggerFactory,
+            IRebusTime rebusTime)
+        {
+            _amazonS3Config = amazonS3Config ?? throw new ArgumentNullException(nameof(amazonS3Config));
+            _transferUtilityConfig = transferUtilityConfig ?? throw new ArgumentNullException(nameof(transferUtilityConfig));
+            _rebusTime = rebusTime ?? throw new ArgumentNullException(nameof(rebusTime));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _log = rebusLoggerFactory?.GetLogger<AmazonS3DataBusStorage>() ?? throw new ArgumentNullException(nameof(rebusLoggerFactory));
+            _metadataCollectionFactory = new S3MetadataCollectionFactory(options);
+
+            if (options.AutoCreateBucket)
+            {
+                EnsureBucketExistsAsync().GetAwaiter().GetResult();
+            }
+        }
+
+
+
         public async Task Save(string id, Stream source, Dictionary<string, string> metadata = null)
         {
             await TryCatchAsync(id, async (identity) =>
@@ -187,7 +209,9 @@ namespace Rebus.AmazonS3
 
         AmazonS3Client CreateS3Client()
         {
-            return new AmazonS3Client(_credentials, _amazonS3Config);
+            if (_credentials != null)
+               return new AmazonS3Client(_credentials, _amazonS3Config);
+            return new AmazonS3Client(_amazonS3Config);
         }
 
         ITransferUtility CreateTransferUtility(AmazonS3Client s3Client = null)

@@ -72,5 +72,17 @@ namespace Rebus.Config
                 return new AmazonS3DataBusStorage(credentials, config, options, transferUtilityConfig, rebusLoggerFactory, rebusTime);
             });
         }
+
+
+        static void Configure(StandardConfigurer<IDataBusStorage> configurer, AmazonS3Config config, AmazonS3DataBusOptions options, TransferUtilityConfig transferUtilityConfig)
+        {
+            configurer.Register(c =>
+            {
+                var rebusLoggerFactory = c.Get<IRebusLoggerFactory>();
+                var rebusTime = c.Get<IRebusTime>();
+
+                return new AmazonS3DataBusStorage(config, options, transferUtilityConfig, rebusLoggerFactory, rebusTime);
+            });
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace Rebus.AmazonS3.Tests
                 }
             }
 
-            throw new RebusConfigurationException("Missing Amazon S3 connection info");
+            throw new RebusConfigurationException($"Missing Amazon S3 connection info - looked for a file named {ConnectionInfoFile} next to the running tests and an environment variable named {ConnectionInfoEnvironment}");
         });
 
         private static string GetFilePath(string filename)
@@ -49,7 +49,7 @@ namespace Rebus.AmazonS3.Tests
             // added because of test run issues on MacOS
             var indexOfBin = baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase);
             var connectionStringFileDirectory = baseDirectory.Substring(0, (indexOfBin > 0) ? indexOfBin : baseDirectory.Length);
-            
+
             return Path.Combine(connectionStringFileDirectory, filename);
         }
     }

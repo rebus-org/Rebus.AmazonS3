@@ -11,13 +11,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Rebus" Version="6.0.0" />
-    <PackageReference Include="Rebus.Tests.Contracts" Version="6.0.0" />
+    <PackageReference Include="Rebus.Tests.Contracts" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rebus.AmazonS3\Rebus.AmazonS3.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="s3_connectioninfo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

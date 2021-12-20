@@ -43,10 +43,9 @@ namespace Rebus.AmazonS3.Tests
             // Test
             var exception = Assert.Throws<AggregateException>(() =>
             {
-                using (var source = new MemoryStream(new byte[0]))
-                {
-                    _storage.Save(KnownId, source, illegalMetadata).Wait();
-                }
+                using var source = new MemoryStream(Array.Empty<byte>());
+                
+                _storage.Save(KnownId, source, illegalMetadata).Wait();
             });
             
             // Verify
@@ -67,7 +66,7 @@ namespace Rebus.AmazonS3.Tests
             };
             
             // Test
-            using (var source = new MemoryStream(new byte[0]))
+            await using (var source = new MemoryStream(Array.Empty<byte>()))
             {
                 await _storage.Save(KnownId, source, metadata);
             }

@@ -34,7 +34,7 @@ namespace Rebus.AmazonS3.Tests
         {
             DateTimeOffset? fakeNow;
 
-            public DateTimeOffset Now => fakeNow ?? Now;
+            public DateTimeOffset Now => fakeNow ?? DateTimeOffset.Now;
 
             public void Set(DateTimeOffset newNow) => fakeNow = newNow;
         }

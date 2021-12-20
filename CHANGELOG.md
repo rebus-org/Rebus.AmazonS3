@@ -11,7 +11,11 @@
 ## 2.0.0
 * Update to Rebus 6
 
+## 2.1.0
+* Add ability to omit awscredentials and rely integrated auth instead - thanks [ovd-capturi]
+
 ---
 
 [alexanderyaremchuk]: https://github.com/alexanderyaremchuk
 [micdah]: https://github.com/micdah
+[ovd-capturi]: https://github.com/ovd-capturi

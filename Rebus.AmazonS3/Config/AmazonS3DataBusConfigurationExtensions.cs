@@ -49,6 +49,19 @@ namespace Rebus.Config
                 transferUtilityConfig ?? new TransferUtilityConfig());
         }
 
+
+        /// <summary>
+        /// Configures the data bus to store data in Amazon S3
+        /// </summary>
+        public static void StoreInAmazonS3(this StandardConfigurer<IDataBusStorage> configurer, AmazonS3Config config, AmazonS3DataBusOptions options, TransferUtilityConfig transferUtilityConfig = null)
+        {
+            if (configurer == null) throw new ArgumentNullException(nameof(configurer));            
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+
+            Configure(configurer, config, options, transferUtilityConfig ?? new TransferUtilityConfig());
+        }
+
         static void Configure(StandardConfigurer<IDataBusStorage> configurer, AWSCredentials credentials, AmazonS3Config config, AmazonS3DataBusOptions options, TransferUtilityConfig transferUtilityConfig)
         {
             configurer.Register(c =>
@@ -57,6 +70,18 @@ namespace Rebus.Config
                 var rebusTime = c.Get<IRebusTime>();
 
                 return new AmazonS3DataBusStorage(credentials, config, options, transferUtilityConfig, rebusLoggerFactory, rebusTime);
+            });
+        }
+
+
+        static void Configure(StandardConfigurer<IDataBusStorage> configurer, AmazonS3Config config, AmazonS3DataBusOptions options, TransferUtilityConfig transferUtilityConfig)
+        {
+            configurer.Register(c =>
+            {
+                var rebusLoggerFactory = c.Get<IRebusLoggerFactory>();
+                var rebusTime = c.Get<IRebusTime>();
+
+                return new AmazonS3DataBusStorage(config, options, transferUtilityConfig, rebusLoggerFactory, rebusTime);
             });
         }
     }

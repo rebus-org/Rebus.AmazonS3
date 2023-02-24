@@ -22,8 +22,8 @@
    </None>
  </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Rebus" Version="6.0.0" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.11" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="Rebus" Version="7.0.0" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.103.15" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 </Project>

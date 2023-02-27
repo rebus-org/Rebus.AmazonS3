@@ -14,6 +14,9 @@
 ## 2.1.0
 * Add ability to omit awscredentials and rely integrated auth instead - thanks [ovd-capturi]
 
+## 2.2.0
+* Update AWSSDK.S3 dependency to 3.7.103.15
+
 ---
 
 [alexanderyaremchuk]: https://github.com/alexanderyaremchuk

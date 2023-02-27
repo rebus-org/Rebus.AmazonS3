@@ -139,7 +139,7 @@ namespace Rebus.AmazonS3
             {
                 using (var s3Client = CreateS3Client())
                 {
-                    if (await AmazonS3Util.DoesS3BucketExistAsync(s3Client, _options.BucketName)) return;
+                    if (await AmazonS3Util.DoesS3BucketExistV2Async(s3Client, _options.BucketName)) return;
 
                     _log.Info("Creating bucket '{BucketName}'", _options.BucketName);
                     try

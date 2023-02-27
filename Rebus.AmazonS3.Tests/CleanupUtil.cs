@@ -5,99 +5,98 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Rebus.AmazonS3.Tests
+namespace Rebus.AmazonS3.Tests;
+
+public class CleanupUtil
 {
-    public class CleanupUtil
+    private readonly ConnectionInfo _connectionInfo;
+
+    public CleanupUtil(ConnectionInfo connectionInfo)
     {
-        private readonly ConnectionInfo _connectionInfo;
+        _connectionInfo = connectionInfo;
+    }
 
-        public CleanupUtil(ConnectionInfo connectionInfo)
+    public void Cleanup()
+    {
+        using (var client = CreateS3Client())
         {
-            _connectionInfo = connectionInfo;
+            IList<string> keys = GetObjectKeys(client);
+
+            DeleteObjects(client, keys);
+        }
+    }
+
+    private List<string> GetObjectKeys(IAmazonS3 client)
+    {
+        var keys = new List<string>();
+        var listRequest = new ListObjectsRequest
+        {
+            BucketName = _connectionInfo.BucketName
+        };
+
+        var response = AsyncHelper.RunSync(() =>
+        {
+            return client.ListObjectsAsync(listRequest);
+        });
+
+        foreach (S3Object obj in response.S3Objects)
+        {
+            keys.Add(obj.Key);
         }
 
-        public void Cleanup()
-        {
-            using (var client = CreateS3Client())
-            {
-                IList<string> keys = GetObjectKeys(client);
+        return keys;
+    }
 
-                DeleteObjects(client, keys);
-            }
+    private void DeleteObjects(IAmazonS3 client, IList<string> keys)
+    {
+        var objects = new List<KeyVersion>();
+        foreach (string key in keys)
+        {
+            objects.Add(new KeyVersion { Key = key });
         }
 
-        private List<string> GetObjectKeys(IAmazonS3 client)
+        if (objects.Count > 0)
         {
-            var keys = new List<string>();
-            var listRequest = new ListObjectsRequest
+            var request = new DeleteObjectsRequest
             {
-                BucketName = _connectionInfo.BucketName
+                BucketName = _connectionInfo.BucketName,
+                Objects = objects
             };
 
-            var response = AsyncHelper.RunSync(() =>
+            AsyncHelper.RunSync(() =>
             {
-                return client.ListObjectsAsync(listRequest);
+                return client.DeleteObjectsAsync(request);
             });
+        }
+    }
 
-            foreach (S3Object obj in response.S3Objects)
-            {
-                keys.Add(obj.Key);
-            }
+    private IAmazonS3 CreateS3Client()
+    {
+        return new AmazonS3Client(_connectionInfo.Credentials, _connectionInfo.Config);
+    }
 
-            return keys;
+    private static class AsyncHelper
+    {
+        private static readonly TaskFactory _myTaskFactory = new
+            TaskFactory(CancellationToken.None,
+                TaskCreationOptions.None,
+                TaskContinuationOptions.None,
+                TaskScheduler.Default);
+
+        public static TResult RunSync<TResult>(Func<Task<TResult>> func)
+        {
+            return _myTaskFactory.StartNew(func)
+                .Unwrap()
+                .GetAwaiter()
+                .GetResult();
         }
 
-        private void DeleteObjects(IAmazonS3 client, IList<string> keys)
+        public static void RunSync(Func<Task> func)
         {
-            var objects = new List<KeyVersion>();
-            foreach (string key in keys)
-            {
-                objects.Add(new KeyVersion { Key = key });
-            }
-
-            if (objects.Count > 0)
-            {
-                var request = new DeleteObjectsRequest
-                {
-                    BucketName = _connectionInfo.BucketName,
-                    Objects = objects
-                };
-
-                AsyncHelper.RunSync(() =>
-                {
-                    return client.DeleteObjectsAsync(request);
-                });
-            }
-        }
-
-        private IAmazonS3 CreateS3Client()
-        {
-            return new AmazonS3Client(_connectionInfo.Credentials, _connectionInfo.Config);
-        }
-
-        private static class AsyncHelper
-        {
-            private static readonly TaskFactory _myTaskFactory = new
-              TaskFactory(CancellationToken.None,
-                          TaskCreationOptions.None,
-                          TaskContinuationOptions.None,
-                          TaskScheduler.Default);
-
-            public static TResult RunSync<TResult>(Func<Task<TResult>> func)
-            {
-                return _myTaskFactory.StartNew(func)
-                  .Unwrap()
-                  .GetAwaiter()
-                  .GetResult();
-            }
-
-            public static void RunSync(Func<Task> func)
-            {
-                _myTaskFactory.StartNew(func)
-                  .Unwrap()
-                  .GetAwaiter()
-                  .GetResult();
-            }
+            _myTaskFactory.StartNew(func)
+                .Unwrap()
+                .GetAwaiter()
+                .GetResult();
         }
     }
 }

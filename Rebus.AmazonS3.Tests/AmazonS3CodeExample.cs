@@ -6,35 +6,35 @@ using Rebus.Activation;
 using Rebus.Config;
 using Rebus.Tests.Contracts;
 using Rebus.Transport.InMem;
+#pragma warning disable CS1998
 
-namespace Rebus.AmazonS3.Tests
+namespace Rebus.AmazonS3.Tests;
+
+[TestFixture]
+[Ignore("just some code to post on GitHub")]
+public class AmazonS3CodeExample : FixtureBase
 {
-    [TestFixture]
-    [Ignore("just some code to post on GitHub")]
-    public class AmazonS3CodeExample : FixtureBase
+    [Test]
+    public async Task ThisIsHowItLooks()
     {
-        [Test]
-        public async Task ThisIsHowItLooks()
-        {
-            var activator = new BuiltinHandlerActivator();
+        var activator = new BuiltinHandlerActivator();
 
-            Using(activator);
+        Using(activator);
 
-            Configure.With(activator)
-                .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "api-tjek"))
-                .DataBus(d =>
+        Configure.With(activator)
+            .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "api-tjek"))
+            .DataBus(d =>
+            {
+                var options = new AmazonS3DataBusOptions("my-bucket")
                 {
-                    var options = new AmazonS3DataBusOptions("my-bucket")
-                    {
-                        DoNotUpdateLastReadTime = true
-                    };
+                    DoNotUpdateLastReadTime = true
+                };
 
-                    var credentials = new BasicAWSCredentials("access-key", "secret-key");
-                    var config = new AmazonS3Config();
+                var credentials = new BasicAWSCredentials("access-key", "secret-key");
+                var config = new AmazonS3Config();
 
-                    d.StoreInAmazonS3(credentials, config, options);
-                })
-                .Start();
-        }
+                d.StoreInAmazonS3(credentials, config, options);
+            })
+            .Start();
     }
 }

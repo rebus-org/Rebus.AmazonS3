@@ -2,55 +2,54 @@
 using System;
 using System.IO;
 
-namespace Rebus.AmazonS3.Tests
+namespace Rebus.AmazonS3.Tests;
+
+public class AmazonS3ConnectionInfoUtil
 {
-    public class AmazonS3ConnectionInfoUtil
+    const string ConnectionInfoFile = "s3_connectioninfo.txt";
+    const string ConnectionInfoEnvironment = "REBUS_S3_CONNECTIONINFO";
+
+    public static readonly Lazy<ConnectionInfo> ConnectionInfo = new Lazy<ConnectionInfo>(() =>
     {
-        const string ConnectionInfoFile = "s3_connectioninfo.txt";
-        const string ConnectionInfoEnvironment = "REBUS_S3_CONNECTIONINFO";
-
-        public static readonly Lazy<ConnectionInfo> ConnectionInfo = new Lazy<ConnectionInfo>(() =>
+        // Load from file
+        var file = GetFilePath(ConnectionInfoFile);
+        if (File.Exists(file))
         {
-            // Load from file
-            var file = GetFilePath(ConnectionInfoFile);
-            if (File.Exists(file))
+            try
             {
-                try
-                {
-                    return Tests.ConnectionInfo.CreateFromString(File.ReadAllText(file));
-                }
-                catch (Exception exception)
-                {
-                    throw new RebusConfigurationException(exception, $"Could not get connection string information from file {file}");
-                }
+                return Tests.ConnectionInfo.CreateFromString(File.ReadAllText(file));
             }
-
-            // Load from environment
-            var env = Environment.GetEnvironmentVariable(ConnectionInfoEnvironment);
-            if (env != null)
+            catch (Exception exception)
             {
-                try
-                {
-                    return Tests.ConnectionInfo.CreateFromString(env);
-                }
-                catch (Exception exception)
-                {
-                    throw new RebusConfigurationException(exception, "Could not get connection string information");
-                }
+                throw new RebusConfigurationException(exception, $"Could not get connection string information from file {file}");
             }
-
-            throw new RebusConfigurationException($"Missing Amazon S3 connection info - looked for a file named {ConnectionInfoFile} next to the running tests and an environment variable named {ConnectionInfoEnvironment}");
-        });
-
-        private static string GetFilePath(string filename)
-        {
-            var baseDirectory = AppContext.BaseDirectory;
-
-            // added because of test run issues on MacOS
-            var indexOfBin = baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase);
-            var connectionStringFileDirectory = baseDirectory.Substring(0, (indexOfBin > 0) ? indexOfBin : baseDirectory.Length);
-
-            return Path.Combine(connectionStringFileDirectory, filename);
         }
+
+        // Load from environment
+        var env = Environment.GetEnvironmentVariable(ConnectionInfoEnvironment);
+        if (env != null)
+        {
+            try
+            {
+                return Tests.ConnectionInfo.CreateFromString(env);
+            }
+            catch (Exception exception)
+            {
+                throw new RebusConfigurationException(exception, "Could not get connection string information");
+            }
+        }
+
+        throw new RebusConfigurationException($"Missing Amazon S3 connection info - looked for a file named {ConnectionInfoFile} next to the running tests and an environment variable named {ConnectionInfoEnvironment}");
+    });
+
+    private static string GetFilePath(string filename)
+    {
+        var baseDirectory = AppContext.BaseDirectory;
+
+        // added because of test run issues on MacOS
+        var indexOfBin = baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase);
+        var connectionStringFileDirectory = baseDirectory.Substring(0, (indexOfBin > 0) ? indexOfBin : baseDirectory.Length);
+
+        return Path.Combine(connectionStringFileDirectory, filename);
     }
 }

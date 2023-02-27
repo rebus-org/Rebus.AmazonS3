@@ -128,7 +128,7 @@ namespace Rebus.AmazonS3
             {
                 try
                 {
-                    if (await AmazonS3Util.DoesS3BucketExistAsync(s3Client, _options.BucketName))
+                    if (await AmazonS3Util.DoesS3BucketExistV2Async(s3Client, _options.BucketName))
                     {
                         return;
                     }

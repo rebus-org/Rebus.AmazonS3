@@ -38,7 +38,7 @@ namespace Rebus.AmazonS3
 
         public bool IsCentralized => true;
 
-        public async Task<string[]> GetSubscriberAddresses(string topic)
+        public async Task<IReadOnlyList<string>> GetSubscriberAddresses(string topic)
         {
             await EnsureBucketExistAsync();
 

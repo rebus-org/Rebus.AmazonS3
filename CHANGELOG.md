@@ -17,6 +17,9 @@
 ## 2.2.0
 * Update AWSSDK.S3 dependency to 3.7.103.15
 
+## 3.0.0-alpha01
+* Update to Rebus 8
+
 ---
 
 [alexanderyaremchuk]: https://github.com/alexanderyaremchuk

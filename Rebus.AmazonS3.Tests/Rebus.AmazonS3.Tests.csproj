@@ -1,26 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
- <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFrameworks>net6.0</TargetFrameworks>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="microsoft.net.test.sdk" Version="17.5.0" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rebus.Tests.Contracts" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Rebus.AmazonS3\Rebus.AmazonS3.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="s3_connectioninfo.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFrameworks>net7.0</TargetFrameworks>
+		<LangVersion>11</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="microsoft.net.test.sdk" Version="17.5.0" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.4.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Rebus.Tests.Contracts" Version="8.0.0-alpha01" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Rebus.AmazonS3\Rebus.AmazonS3.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="Core\" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="s3_connectioninfo.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

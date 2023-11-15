@@ -11,7 +11,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Rebus.Tests.Contracts" Version="8.0.0-alpha01" />
+		<PackageReference Include="Rebus.Tests.Contracts" Version="8.0.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Rebus.AmazonS3\Rebus.AmazonS3.csproj" />
